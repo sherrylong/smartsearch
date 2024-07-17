@@ -4,9 +4,11 @@
     <form method="POST" action="{{ url_for('handle_search') }}">
       <div class="mb-3">
           <input type="text" class="form-control" name="query" id="query" placeholder="Enter your search query" value="{{ query }}" autofocus>
+          <input type="hidden" name="from_" value="0">
       </div>
     </form>
     {% if results %}
+    <div class="mb-3">Searching <i>{{ modified_query }} </i></div>
         <div class="row mb-3">
             <div class="col-2 mt-2">
                 <p><a href="javascript:history.back(1)">← Back</a></p>
@@ -15,6 +17,7 @@
                     {% for key, count in aggs[agg].items() %}
                         <form method="POST">
                             <input type="hidden" name="query" value="{{ agg|lower }}:{{key}} {{ query }}">
+                            <input type="hidden" name="from_" value="0">
                             <button type="submit" class="btn btn-link btn-sm"{% if aggs[agg]|length == 1 %} disabled{% endif %}>{{ key }} ({{ count }})</button>
                         </form>
                     {% endfor %}
@@ -27,7 +30,11 @@
                     </div>
                     {% if from_ > 0 %}
                         <div class="col-sm-auto my-auto">
-                            <a href="javascript:history.back(1)" class="btn btn-primary">← Previous page</a>
+                            <form method="POST" action="{{ url_for('handle_search') }}">
+                                <input type="hidden" name="query" value="{{ query }}">
+                                <input type="hidden" name="from_" value="{{ from_ - 5 }}">
+                                <button type="submit" class="btn btn-primary">← Previous page</button>
+                            </form>
                         </div>
                     {% endif %}
                     {% if from_ + results|length < total %}
@@ -45,7 +52,11 @@
                     <p>
                         {{ from_ + loop.index }}. <b><a href="{{ url_for('get_document', id=result._id) }}">{{ result._source.title }}</a></b>
                         <br>
-                        {{ result._source.description | truncate(500, True) }}
+                        {% if result.highlight and result.highlight.description %}
+                            {{ result.highlight.description[0] | safe }}
+                        {% else %}
+                            {{ result._source.description | truncate(200, True) }}
+                        {% endif %}
                         <br>
                         <small>
                             <!-- Category: {{ result._source.user_categories }}. -->

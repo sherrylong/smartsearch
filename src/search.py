@@ -23,7 +23,7 @@ class Search:
     def insert_document(self, document):
         return self.es.index(index='my_documents', body=document)
     
-    def insert_documents(self, documents, batch_size=100):
+    def insert_documents(self, documents, batch_size=10000):
         def chunks(lst, n):
             for i in range(0, len(lst), n):
                 yield lst[i:i + n]
@@ -50,8 +50,9 @@ class Search:
 
     def reindex(self):
         self.create_index()
-        documents = self.parse_xml('grants-data.xml')
+        documents = self.parse_xml('../data/grants-data.xml')
         self.insert_documents(documents)
+        print(str(len(documents)) + ' documents indexed')
     
     def search(self, **query_args):
         return self.es.search(index='my_documents', **query_args)

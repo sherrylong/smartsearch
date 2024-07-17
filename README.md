@@ -15,7 +15,7 @@ docker run -p 9200:9200 -d --name elasticsearch \
 2. Connect Python client
 
 ```
-python connect-to-python.py
+python connect_python.py
 ```
 
 3. Create virtual environment
