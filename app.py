@@ -1,5 +1,5 @@
 import re, os
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 from src.rewrite_query import rewrite_query
 from src.search import Search
 
@@ -14,17 +14,27 @@ def index():
 
 
 @app.route('/', methods=['GET', 'POST'])
-def handle_search():
+def submit_search():
     if request.method == 'POST':
         query = request.form.get('query', '')
-        from_ = request.form.get('from_', type=int, default=0)
-        
+        session['query'] = query
+        return redirect(url_for('search_results', query=query, from_=0))
+    return render_template('index.html')
+
+
+@app.route('/search_results')
+def search_results():
+    query = request.args.get('query', '')
+    from_ = request.args.get('from_', type=int, default=0)
+    
+    if query:
         if 'query' in session and session['query'] == query:
-            modified_query = session['modified_query']
+            modified_query = session.get('modified_query', '')
         else:
-            session['query'] = query
             modified_query = rewrite_query(query)
             session['modified_query'] = modified_query
+            session['modified_query'] = modified_query
+            session['query'] = query
 
     results = es.search(
         query={
