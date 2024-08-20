@@ -1,4 +1,11 @@
-# Local Project Setup
+# Next-Generation End-to-End Search
+Forward Data Lab <br/>
+University of Illinois Urbana-Champaign
+
+## Overview
+This module leverages large language models to reformulate search engine queries, enhancing search for relevant grants, scholarships, and funding opportunities provided by the University of Illinois.
+
+## Setup
 
 1. Create Docker network
 
